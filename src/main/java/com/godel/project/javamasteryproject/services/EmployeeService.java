@@ -6,10 +6,12 @@ import com.godel.project.javamasteryproject.dao.entities.EmployeeEntity;
 import com.godel.project.javamasteryproject.dao.interfaces.IEmployeeDao;
 import com.godel.project.javamasteryproject.services.interfaces.IEmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,8 +28,12 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public EmployeeDto getById(long id) {
-        EmployeeEntity employeeEntity = employeeDao.getById(id);
-        return converter.convertToDto(employeeEntity);
+        Optional<EmployeeEntity> employeeEntityOptional = employeeDao.getById(id);
+        if (employeeEntityOptional.isPresent()) {
+            return converter.convertToDto(employeeEntityOptional.get());
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     @Override
@@ -40,28 +46,30 @@ public class EmployeeService implements IEmployeeService {
     public List<EmployeeDto> getAll() {
         List<EmployeeEntity> entities = employeeDao.getAll();
         if (entities.isEmpty()) {
-            return null;
+            throw new EmptyResultDataAccessException(1);
         }
         return entities.stream().map(converter::convertToDto).collect(Collectors.toList());
     }
 
     @Override
     public EmployeeDto update(EmployeeDto employeeDto, long id) {
-        EmployeeEntity entityForUpdate = employeeDao.updateById(converter.convertToEntity(employeeDto), id);
-        if (entityForUpdate == null) {
-            return null;
+        Optional<EmployeeEntity> checkEmployeeOptional = employeeDao.getById(id);
+        if (checkEmployeeOptional.isPresent()) {
+            EmployeeEntity entityForUpdate = employeeDao.updateById(converter.convertToEntity(employeeDto), id);
+            return converter.convertToDto(entityForUpdate);
+        } else {
+            throw new NoSuchElementException();
         }
-        return converter.convertToDto(entityForUpdate);
     }
 
     @Override
     public String delete(long id) {
-        try {
-            employeeDao.getById(id);
-        } catch (DataAccessException ex) {
-            return String.format("The employee with id = %s not exist", id);
+        Optional<EmployeeEntity> checkEmployeeOptional = employeeDao.getById(id);
+        if (checkEmployeeOptional.isPresent()) {
+            employeeDao.deleteById(id);
+            return "Employee deleted successfully";
+        } else {
+            throw new NoSuchElementException();
         }
-        employeeDao.deleteById(id);
-        return String.format("The employee with id = %s deleted successfully", id);
     }
 }

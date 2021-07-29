@@ -8,6 +8,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 target
+mvnw
+mvnw.cmd
+
 
 logs/
 *.lst

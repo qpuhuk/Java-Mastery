@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class EmployeeDao implements IEmployeeDao {
@@ -30,7 +31,7 @@ public class EmployeeDao implements IEmployeeDao {
     @Override
     public EmployeeEntity create(EmployeeEntity employeeEntity) {
 
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("first_name", employeeEntity.getFirstName());
         params.put("last_name", employeeEntity.getLastName());
         params.put("department_id", employeeEntity.getDepartmentId());
@@ -44,15 +45,17 @@ public class EmployeeDao implements IEmployeeDao {
     }
 
     @Override
-    public EmployeeEntity getById(long id) {
-
-        return (EmployeeEntity) jdbcTemplate.queryForObject(
-                "SELECT *  FROM employees WHERE employee_id = ?", new EmployeeRowMapper(), new Object[]{id});
+    public Optional<EmployeeEntity> getById(long id) {
+        String query = "SELECT *  FROM employees WHERE employee_id = ?";
+        Optional<EmployeeEntity> employeeEntityOptional = jdbcTemplate.query(
+                query, new Object[]{id}, new EmployeeRowMapper()).stream().findAny();
+        return employeeEntityOptional;
     }
 
     @Override
     public List<EmployeeEntity> getAll() {
-        return jdbcTemplate.query("SELECT * FROM employees ORDER BY employee_id", new EmployeeRowMapper());
+        String query = "SELECT * FROM employees ORDER BY employee_id";
+        return jdbcTemplate.query(query, new EmployeeRowMapper());
     }
 
     @Override
@@ -78,6 +81,7 @@ public class EmployeeDao implements IEmployeeDao {
 
     @Override
     public void deleteById(long id) {
-        jdbcTemplate.update("DELETE FROM employees WHERE employee_id = ?", id);
+        String query = "DELETE FROM employees WHERE employee_id = ?";
+        jdbcTemplate.update(query, id);
     }
 }

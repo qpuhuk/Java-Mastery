@@ -3,7 +3,6 @@ package com.godel.project.javamasteryproject.utils;
 import com.godel.project.javamasteryproject.enums.Gender;
 import org.springframework.core.convert.converter.Converter;
 
-
 public class EnumFormatter implements Converter<String, Gender> {
     @Override
     public Gender convert(String s) {

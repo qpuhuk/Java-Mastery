@@ -5,6 +5,7 @@ import com.godel.project.javamasteryproject.dao.EmployeeDao;
 import com.godel.project.javamasteryproject.dao.entities.EmployeeEntity;
 import com.godel.project.javamasteryproject.dao.interfaces.IEmployeeDao;
 import com.godel.project.javamasteryproject.services.interfaces.IEmployeeService;
+import com.godel.project.javamasteryproject.utils.EmployeeConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,10 @@ import java.util.stream.Collectors;
 public class EmployeeService implements IEmployeeService {
 
     private final IEmployeeDao employeeDao;
-    private final EmployeeConverterToDtoOrEntity converter;
+    private final EmployeeConverter converter;
 
     @Autowired
-    public EmployeeService(EmployeeDao employeeDao, EmployeeConverterToDtoOrEntity converter) {
+    public EmployeeService(EmployeeDao employeeDao, EmployeeConverter converter) {
         this.employeeDao = employeeDao;
         this.converter = converter;
     }
@@ -30,46 +31,46 @@ public class EmployeeService implements IEmployeeService {
     public EmployeeDto getById(long id) {
         Optional<EmployeeEntity> employeeEntityOptional = employeeDao.getById(id);
         if (employeeEntityOptional.isPresent()) {
-            return converter.convertToDto(employeeEntityOptional.get());
+            return converter.toDto(employeeEntityOptional.get());
         } else {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Get this employee impossible. The such employee not exist");
         }
     }
 
     @Override
     public EmployeeDto create(EmployeeDto employeeDto) {
-        EmployeeEntity employeeEntity = employeeDao.create(converter.convertToEntity(employeeDto));
-        return converter.convertToDto(employeeEntity);
+        EmployeeEntity employeeEntity = employeeDao.create(converter.toEntity(employeeDto));
+        return converter.toDto(employeeEntity);
     }
 
     @Override
     public List<EmployeeDto> getAll() {
         List<EmployeeEntity> entities = employeeDao.getAll();
         if (entities.isEmpty()) {
-            throw new EmptyResultDataAccessException(1);
+            throw new EmptyResultDataAccessException("at least 1", 1);
         }
-        return entities.stream().map(converter::convertToDto).collect(Collectors.toList());
+        return entities.stream().map(converter::toDto).collect(Collectors.toList());
     }
 
     @Override
     public EmployeeDto update(EmployeeDto employeeDto, long id) {
         Optional<EmployeeEntity> checkEmployeeOptional = employeeDao.getById(id);
         if (checkEmployeeOptional.isPresent()) {
-            EmployeeEntity entityForUpdate = employeeDao.updateById(converter.convertToEntity(employeeDto), id);
-            return converter.convertToDto(entityForUpdate);
+            EmployeeEntity entityForUpdate = employeeDao.updateById(converter.toEntity(employeeDto), id);
+            return converter.toDto(entityForUpdate);
         } else {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Update this employee impossible. The such employee not exist");
         }
     }
 
     @Override
-    public String delete(long id) {
+    public void delete(long id) {
         Optional<EmployeeEntity> checkEmployeeOptional = employeeDao.getById(id);
         if (checkEmployeeOptional.isPresent()) {
             employeeDao.deleteById(id);
-            return "Employee deleted successfully";
+
         } else {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("Delete this employee impossible. The such employee not exist\"");
         }
     }
 }

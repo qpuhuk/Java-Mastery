@@ -9,7 +9,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new EnumFormatter());
         registry.addConverter(new LocalDateFormatter());
     }
 }

@@ -2,7 +2,7 @@ package com.godel.project.javamasteryproject.dao;
 
 import com.godel.project.javamasteryproject.dao.entities.EmployeeEntity;
 import com.godel.project.javamasteryproject.dao.interfaces.IEmployeeDao;
-import com.godel.project.javamasteryproject.services.EmployeeRowMapper;
+import com.godel.project.javamasteryproject.utils.EmployeeRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,8 +16,8 @@ import java.util.Optional;
 @Repository
 public class EmployeeDao implements IEmployeeDao {
 
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
+    private  JdbcTemplate jdbcTemplate;
+    private  SimpleJdbcInsert simpleJdbcInsert;
 
     @Autowired
     public EmployeeDao(JdbcTemplate jdbcTemplate) {

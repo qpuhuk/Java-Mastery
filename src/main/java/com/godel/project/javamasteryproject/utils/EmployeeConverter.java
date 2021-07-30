@@ -1,9 +1,9 @@
-package com.godel.project.javamasteryproject.services;
+package com.godel.project.javamasteryproject.utils;
 
 import com.godel.project.javamasteryproject.controllers.dto.EmployeeDto;
 import com.godel.project.javamasteryproject.dao.entities.EmployeeEntity;
 import com.godel.project.javamasteryproject.enums.Gender;
-import com.godel.project.javamasteryproject.services.interfaces.IEmployeeConverterToDtoOrEntity;
+import com.godel.project.javamasteryproject.utils.interfaces.IEmployeeConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
@@ -12,30 +12,30 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Component
-public class EmployeeConverterToDtoOrEntity implements IEmployeeConverterToDtoOrEntity {
+public class EmployeeConverter implements IEmployeeConverter {
 
     private final ConversionService conversionService;
 
     @Autowired
-    public EmployeeConverterToDtoOrEntity(ConversionService conversionService) {
+    public EmployeeConverter(ConversionService conversionService) {
         this.conversionService = conversionService;
     }
 
     @Override
-    public EmployeeEntity convertToEntity(EmployeeDto employeeDto) {
+    public EmployeeEntity toEntity(EmployeeDto employeeDto) {
         EmployeeEntity employeeEntity = new EmployeeEntity();
         employeeEntity.setEmployeeId(employeeDto.getEmployeeId());
         employeeEntity.setFirstName(employeeDto.getFirstName());
         employeeEntity.setLastName(employeeDto.getLastName());
         employeeEntity.setDepartmentId(employeeDto.getDepartmentId());
-        employeeEntity.setGender(Objects.requireNonNull(conversionService.convert(employeeDto.getGender(), Gender.class)));
+        employeeEntity.setGender(Gender.valueOf(employeeDto.getGender().toUpperCase()));
         employeeEntity.setDateOfBirth(Objects.requireNonNull(conversionService.convert(employeeDto.getDateOfBirth(), LocalDate.class)));
         employeeEntity.setJobTitle(employeeDto.getJobTitle());
         return employeeEntity;
     }
 
     @Override
-    public EmployeeDto convertToDto(EmployeeEntity employeeEntity) {
+    public EmployeeDto toDto(EmployeeEntity employeeEntity) {
         EmployeeDto employeeDto = new EmployeeDto();
         employeeDto.setEmployeeId(employeeEntity.getEmployeeId());
         employeeDto.setFirstName(employeeEntity.getFirstName());

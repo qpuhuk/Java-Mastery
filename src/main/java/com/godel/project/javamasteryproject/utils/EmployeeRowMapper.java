@@ -1,4 +1,4 @@
-package com.godel.project.javamasteryproject.services;
+package com.godel.project.javamasteryproject.utils;
 
 import com.godel.project.javamasteryproject.dao.entities.EmployeeEntity;
 import com.godel.project.javamasteryproject.enums.Gender;
